@@ -2,13 +2,13 @@
     <ion-page>
         <ion-content>
             <ion-card>
-                <h1 class="ion-text-center" color="light">Agregar Categoria</h1>
+                <h2 class="ion-text-center" >Agregar Categoria</h2>
                 <ion-item color="light">
                     <ion-input v-model="categoria.nombre" obligatorio="*" id="nombre" type="text" label="Nombre"
                         placeholder="Digite el nombre de la categoria" required />
                 </ion-item>
                 <ion-item color="light">
-                    <ion-input v-model="categoria.descripcion" obligatorio="*" id="marca" type="text" label="Marca"
+                    <ion-input v-model="categoria.descripcion" obligatorio="*" id="marca" type="text" label="Descripcion"
                         placeholder="Digite su descripcion" required />
                 </ion-item>
                 <br>
@@ -39,6 +39,7 @@ const guardarCategoria = () => {
                 let estado = response.status;
                 if (estado === 200) {
                     alert('Éxito! ' + ' La acción se realizó correctamente.');
+                    window.location.href='/datos-categorias'
                 }
             })
             .catch(function (error) {

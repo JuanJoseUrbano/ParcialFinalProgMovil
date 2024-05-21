@@ -1,7 +1,12 @@
 <template>
     <ion-page>
         <ion-content ref="content" class="ion-padding">
-                <ion-card color="light" v-for="categoria in categorias" :key="categoria.id">
+            <h1 color="dark">Lista de categorias</h1>
+            <ion-button color="primary" value="agregar" id="guardarCategoria"
+                @click="$router.push('/agregar-categorias')">
+                Agregar
+            </ion-button>
+            <ion-card v-for="categoria in categorias" :key="categoria.id">
                 <ion-card-header>
                     <ion-card-title class="ion-text-center">{{ categoria.nombre }}</ion-card-title>
                 </ion-card-header>
@@ -19,35 +24,49 @@
                 </ion-item>
             </ion-card>
             <ion-modal :is-open="modalIsOpen">
+                <ion-header>
+                    <ion-toolbar color="light">
+                        <ion-buttons slot="start">
+                            <ion-button @click="setOpen(false)">
+                                < Regresar</ion-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <div class="modal-content">
+                    <div id="data-form">
                         <h1 class="ion-text-center">Actualizar Categoria</h1>
                         <ion-item color="light">
-                            <ion-input v-model="categorias.nombre" id="nombre" type="text" label="Nombre"
+                            <ion-input v-model="categoriaJson.nombre" id="nombre" type="text" label="Nombre"
                                 placeholder="Digite el nombre de la categoria" required />
                         </ion-item>
                         <ion-item color="light">
-                            <ion-input v-model="categorias.descripcion" obligatorio="*" id="marca" type="text"
+                            <ion-input v-model="categoriaJson.descripcion" obligatorio="*" id="marca" type="text"
                                 label="Marca" placeholder="Digite su descripcion" required />
                         </ion-item>
                         <br>
                         <ion-button id="guardar" value="Guardar" color="primary"
                             @Click="actualizarCategoria()">Editar</ion-button>
+                    </div>
+                </div>
             </ion-modal>
         </ion-content>
     </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent, IonItem, IonCard, IonButton, IonInput,IonCardHeader,IonModal } from '@ionic/vue';
+import { IonPage, IonContent, IonItem, IonCard, IonButton, IonInput, IonCardHeader, IonModal, IonToolbar, IonHeader, IonButtons } from '@ionic/vue';
 import axios from 'axios'
 import { ref, onMounted } from 'vue';
 
 let url = 'http://localhost:9000/parcial/api/categoria'
 let categorias = ref([])
 let categoriaJson = {
-    nombre: categorias.nombre,
-    descripcion: categorias.descripcion
+    nombre: '',
+    descripcion: ''
 }
 let modalIsOpen = ref(false)
+let idActualizar = ref()
+const setOpen = (open: boolean) => (modalIsOpen.value = open)
 
 onMounted(() => {
     obtenerCategorias();
@@ -57,7 +76,6 @@ const obtenerCategorias = () => {
     axios.get(url).then(
         (response) => {
             categorias.value = response.data;
-            console.log(categorias)
         }
     ).catch(function (error) {
         console.error("Estado de la petición: ", error);
@@ -66,11 +84,13 @@ const obtenerCategorias = () => {
 }
 
 const obtenerPorId = (id) => {
-    let urlById = url +'/'+ id;
+    let urlById = url + '/' + id;
     axios.get(urlById).then(
         (response) => {
             let datos = response.data;
-            categorias = datos
+            idActualizar = datos.id
+            categoriaJson.nombre = datos.nombre
+            categoriaJson.descripcion = datos.descripcion
             modalIsOpen.value = true;
         }).catch((error) => {
             console.error("Error al obtener producto por ID:", error);
@@ -78,16 +98,17 @@ const obtenerPorId = (id) => {
 };
 
 const actualizarCategoria = () => {
-    if (categoriaJson.nombre.trim() === '') {
+    if (categoriaJson.nombre === '') {
         alert('Ingrese un nombre')
-    } else if (categoriaJson.descripcion.trim() === '') {
+    } else if (categoriaJson.descripcion === '') {
         alert('Ingrese una descripcion')
     } else {
-        axios({ method: 'PUT', url: url, data: categoriaJson })
+        axios({ method: 'PUT', url: url + '/' + idActualizar, data: categoriaJson })
             .then(function (response) {
                 let estado = response.status;
                 if (estado === 200) {
                     alert('Éxito! ' + ' La acción se realizó correctamente.');
+                    window.location.href = '/datos-categorias'
                 }
             })
             .catch(function (error) {
@@ -99,16 +120,17 @@ const actualizarCategoria = () => {
 }
 
 const eliminarCategoria = (id) => {
-        axios({ method: 'DELETE', url: url+'/'+id, data: {id:id} })
-            .then(function (response) {
-                let estado = response.status;
-                if (estado === 200) {
-                    alert('Éxito! ' + ' La acción se realizó correctamente.');
-                }
-            })
-            .catch(function (error) {
-                console.error("Estado de la petición: ", error);
-                alert('Error' + ' No se pudo realizar la acción');
-            });
-    }
+    axios({ method: 'DELETE', url: url + '/' + id, data: { id: id } })
+        .then(function (response) {
+            let estado = response.status;
+            if (estado === 200) {
+                alert('Éxito! ' + ' La acción se realizó correctamente.');
+                window.location.href = '/datos-categorias'
+            }
+        })
+        .catch(function (error) {
+            console.error("Estado de la petición: ", error);
+            alert('Error' + ' No se pudo realizar la acción');
+        });
+}
 </script>

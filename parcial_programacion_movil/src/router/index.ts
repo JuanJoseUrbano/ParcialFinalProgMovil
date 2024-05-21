@@ -3,6 +3,8 @@ import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue'
 import DataCategoria from '@/views/DataCategoria.vue';
 import AgregarCategoria from '@/views/AgregarCategoria.vue';
+import DataCarros from '@/views/DataCarros.vue';
+import AgregarCarrito from '@/views/AgregarCarrito.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -23,6 +25,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/agregar-categorias',
     name: 'agregar-categoria',
     component: AgregarCategoria
+  },
+  {
+    path: '/datos-carros',
+    name: 'datos-carros',
+    component: DataCarros
+  },
+  {
+    path: '/agregar-carro',
+    name: 'agregar-carro',
+    component: AgregarCarrito
   }
 ]
 
